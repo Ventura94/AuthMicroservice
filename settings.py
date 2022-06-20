@@ -1,5 +1,7 @@
 from database.mongo_service import MongoService
 
+auth_database = ""
+
 DB_URL = ""
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
