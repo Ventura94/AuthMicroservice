@@ -18,7 +18,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login", description="authori
 @router.post(
     "/login",
     response_model=Token,
-    name="Login System",
+    name="Login user authentication",
     description="Credentials are sent to build the access token",
 )
 async def login(form_data: UserCredentialsForm = Depends()):
@@ -41,7 +41,10 @@ async def login(form_data: UserCredentialsForm = Depends()):
         )
 
 
-@router.post("/users/register", response_model=User)
+@router.post("/users/register",
+             response_model=User,
+             name="Register users",
+             description="Register users")
 async def register(form_data: UserRegisterForm = Depends()):
     data = dict(
         username=form_data.username,
@@ -66,6 +69,9 @@ async def register(form_data: UserRegisterForm = Depends()):
         )
 
 
-@router.get("/auth_user/", response_model=User)
+@router.get("/auth_user/",
+            response_model=User,
+            name="Authenticate user data",
+            description="Get authenticate user data")
 async def read_items(user: User = Depends(AuthService().o2auth)):
     return user
