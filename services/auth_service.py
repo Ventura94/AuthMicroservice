@@ -1,13 +1,13 @@
 from typing import Dict
 
+from ServiceWrapper.orm.asyncio.mongodb import MongoDB
+from ServiceWrapper.services.asyncio.service import Create, Delete, Update
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from jose.exceptions import ExpiredSignatureError, JWTClaimsError, JWTError
 from passlib.context import CryptContext
 from starlette import status
-from ServiceWrapper.orm.asyncio.mongodb import MongoDB
-from ServiceWrapper.services.asyncio.service import Create
 
 from database.mongo_service import MongoService
 from schemas.user import UserInBD, User
@@ -21,7 +21,7 @@ class UserInMongo:
     mongo.collection = "UserCollection"
 
 
-class AuthService(Create):
+class AuthService(Create, Update, Delete):
     orm_model = MongoDB(UserInMongo.mongo.collection)
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login", description="authorization")

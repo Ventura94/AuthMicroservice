@@ -60,7 +60,7 @@ async def register(form_data: UserRegisterForm = Depends()):
     )
     try:
         await AuthService().create(**UserInBD(**data).dict())
-        return data
+        return User(**data)
     except ValueError as error:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -75,3 +75,13 @@ async def register(form_data: UserRegisterForm = Depends()):
             description="Get authenticate user data")
 async def read_items(user: User = Depends(AuthService().o2auth)):
     return user
+
+
+@router.patch("/update_user/")
+def update_user(user: User = Depends(AuthService().o2auth)):
+    pass
+
+
+@router.delete("/delete_user/")
+def delete_user(user: User = Depends(AuthService().o2auth)):
+    pass
