@@ -41,7 +41,7 @@ async def login(form_data: UserCredentialsForm = Depends()):
         )
 
 
-@router.post("/users/register")
+@router.post("/users/register", response_model=User)
 async def register(form_data: UserRegisterForm = Depends()):
     data = dict(
         username=form_data.username,
@@ -57,7 +57,7 @@ async def register(form_data: UserRegisterForm = Depends()):
     )
     try:
         await AuthService().create(**UserInBD(**data).dict())
-        return User(**data)
+        return data
     except ValueError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -66,6 +66,6 @@ async def register(form_data: UserRegisterForm = Depends()):
         )
 
 
-@router.get("/auth_user/")
-async def read_items(token: str = Depends(oauth2_scheme)):
-    return {"token": token}
+@router.get("/auth_user/", response_model=User)
+async def read_items(user: User = Depends(AuthService().o2auth)):
+    return user
