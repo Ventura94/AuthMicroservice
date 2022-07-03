@@ -1,5 +1,7 @@
 fastapi~=0.78.0
-passlib~=1.7.4
+passlib[bcrypt]
 pydantic~=1.9.1
 motor~=3.0.0
 python-multipart
+python-jose[cryptography]
+uvicorn

@@ -18,11 +18,11 @@ class AuthService(CreateMixin):
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
     async def before_create(self, **kwargs):
-        if not Email.is_valid(kwargs['email']):
+        if not Email.is_valid(kwargs["email"]):
             raise ValueError("This email is not correct")
-        if await self.orm_model.get(username=kwargs['username']):
+        if await self.orm_model.get(username=kwargs["username"]):
             raise ValueError("This username already exist")
-        if await self.orm_model.get(email=kwargs['email']):
+        if await self.orm_model.get(email=kwargs["email"]):
             raise ValueError("This email already exist")
         kwargs["password"] = self.pwd_context.hash(kwargs["password"])
         return kwargs
