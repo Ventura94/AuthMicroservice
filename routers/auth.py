@@ -33,10 +33,10 @@ async def login(form_data: UserCredentialsForm = Depends()):
         token_data.update({"exp": access_token_expires})
         encoded_jwt = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
         return {"access_token": encoded_jwt, "token_type": "bearer"}
-    except ValueError:
+    except ValueError as error:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail=error,
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -58,10 +58,10 @@ async def register(form_data: UserRegisterForm = Depends()):
     try:
         await AuthService().create(**UserInBD(**data).dict())
         return data
-    except ValueError:
+    except ValueError as error:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail=error,
             headers={"WWW-Authenticate": "Bearer"},
         )
 
