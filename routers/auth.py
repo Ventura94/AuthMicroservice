@@ -53,7 +53,7 @@ async def register(form_data: UserRegisterForm = Depends()):
         email=form_data.email,
         phone=form_data.phone,
         password=form_data.password,
-        is_active=True,
+        is_delete=False,
         role=[
             "default",
         ],
@@ -84,4 +84,4 @@ def update_user(user: User = Depends(AuthService().o2auth)):
 
 @router.delete("/delete_user/")
 def delete_user(user: User = Depends(AuthService().o2auth)):
-    pass
+    await AuthService().delete(by="username", **user.dict())

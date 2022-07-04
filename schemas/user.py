@@ -16,7 +16,8 @@ class UserInBD(BaseModel):
     phone: str
     password: str
     role: List[str]
-    is_active: bool
+    is_delete: bool
+    delete_at: str
 
 
 class User(BaseModel):

@@ -37,7 +37,7 @@ class AuthService(Create, Update, Delete):
         except [JWTError, ExpiredSignatureError, JWTClaimsError]:
             raise credentials_exception
         user = await self.orm_model.get(username=payload['username'])
-        if not user or not user.get("is_active", False):
+        if not user or user.get("is_delete", False):
             raise credentials_exception
         return user
 
@@ -57,7 +57,7 @@ class AuthService(Create, Update, Delete):
         else:
             user = await self.orm_model.get(username=username)
         user = UserInBD(**user)
-        if not user or not user.is_active:
+        if not user or user.is_delete:
             raise ValueError("User not found")
         if not self.pwd_context.verify(password, user.password):
             raise ValueError("Incorrect password")
