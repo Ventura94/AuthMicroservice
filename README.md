@@ -1,9 +1,2 @@
-# AuthMicroservice
-Ejemplo de APIGateway en FastAPI.
+# Auth Provider
 
-Ncesario instalar:
-````bach
-cd ServiceWrapper
-
-python setup.py install
-````

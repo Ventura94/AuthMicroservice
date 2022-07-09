@@ -4,8 +4,8 @@ from ServiceWrapper.orm.asyncio.mongodb import MongoDB
 from ServiceWrapper.services.asyncio.service import Create, Delete, Update
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
-from jose import jwt
-from jose.exceptions import ExpiredSignatureError, JWTClaimsError, JWTError
+from jose import jwt, JWTError, ExpiredSignatureError
+from jose.exceptions import JWTClaimsError
 from passlib.context import CryptContext
 from starlette import status
 
@@ -26,28 +26,35 @@ class AuthService(Create, Update, Delete):
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login", description="authorization")
 
-    async def o2auth(self, token: str = Depends(oauth2_scheme)):
-        credentials_exception = HTTPException(
+    @staticmethod
+    def authorized_exception(message: str) -> HTTPException:
+        return HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
+            detail=message,
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+    async def o2auth(self, token: str = Depends(oauth2_scheme)):
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM, ])
-        except [JWTError, ExpiredSignatureError, JWTClaimsError]:
-            raise credentials_exception
+        except JWTClaimsError:
+            raise self.authorized_exception("If any claim is invalid in any way.")
+        except ExpiredSignatureError:
+            raise self.authorized_exception("If the signature has expired.")
+        except JWTError:
+            raise self.authorized_exception("If the signature is invalid in any way.")
         user = await self.orm_model.get(username=payload['username'])
         if not user or user.get("is_delete", False):
-            raise credentials_exception
+            raise self.authorized_exception("User don't exist")
         return user
 
     async def before_create(self, **kwargs) -> Dict[str, str]:
         if not Email.is_valid(kwargs["email"]):
-            raise ValueError("This email is not correct")
+            raise self.authorized_exception("This email is not correct")
         if await self.orm_model.get(username=kwargs["username"]):
-            raise ValueError("This username already exist")
+            raise self.authorized_exception("This username already exist")
         if await self.orm_model.get(email=kwargs["email"]):
-            raise ValueError("This email already exist")
+            raise self.authorized_exception("This email already exist")
         kwargs["password"] = self.pwd_context.hash(kwargs["password"])
         return kwargs
 
@@ -58,7 +65,7 @@ class AuthService(Create, Update, Delete):
             user = await self.orm_model.get(username=username)
         user = UserInBD(**user)
         if not user or user.is_delete:
-            raise ValueError("User not found")
+            raise self.authorized_exception("User not found")
         if not self.pwd_context.verify(password, user.password):
-            raise ValueError("Incorrect password")
+            raise self.authorized_exception("Incorrect password")
         return User(**user.dict())

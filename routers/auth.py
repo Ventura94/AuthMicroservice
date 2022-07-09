@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 
@@ -10,7 +10,7 @@ from schemas.user import User, UserInBD
 from services.auth_service import AuthService
 from settings import ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY, ALGORITHM
 
-router = APIRouter(prefix="/auth", tags=["authorization"])
+router = APIRouter(prefix="/auth", tags=["Authorization"])
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login", description="authorization")
 
@@ -22,23 +22,16 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login", description="authori
     description="Credentials are sent to build the access token",
 )
 async def login(form_data: UserCredentialsForm = Depends()):
-    try:
-        user = await AuthService().user_authenticate(
-            form_data.username, form_data.password
-        )
-        token_data = user.dict()
-        access_token_expires = datetime.utcnow() + timedelta(
-            minutes=ACCESS_TOKEN_EXPIRE_MINUTES
-        )
-        token_data.update({"exp": access_token_expires})
-        encoded_jwt = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
-        return {"access_token": encoded_jwt, "token_type": "bearer"}
-    except ValueError as error:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=error,
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    user = await AuthService().user_authenticate(
+        form_data.username, form_data.password
+    )
+    token_data = user.dict()
+    access_token_expires = datetime.utcnow() + timedelta(
+        minutes=ACCESS_TOKEN_EXPIRE_MINUTES
+    )
+    token_data.update({"exp": access_token_expires})
+    encoded_jwt = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
+    return {"access_token": encoded_jwt, "token_type": "bearer"}
 
 
 @router.post("/users/register",
@@ -58,30 +51,29 @@ async def register(form_data: UserRegisterForm = Depends()):
             "default",
         ],
     )
-    try:
-        await AuthService().create(**UserInBD(**data).dict())
-        return User(**data)
-    except ValueError as error:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=error,
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    await AuthService().create(**UserInBD(**data).dict())
+    return User(**data)
 
 
 @router.get("/auth_user/",
             response_model=User,
             name="Authenticate user data",
             description="Get authenticate user data")
-async def read_items(user: User = Depends(AuthService().o2auth)):
+async def auth_user(user: User = Depends(AuthService().o2auth)):
     return user
 
 
-@router.patch("/update_user/")
-def update_user(user: User = Depends(AuthService().o2auth)):
+@router.patch("/update_profile/")
+async def update_profile(user: User = Depends(AuthService().o2auth)):
+    pass
+
+
+@router.patch("/change_password/")
+async def change_password(user: User = Depends(AuthService().o2auth)):
     pass
 
 
 @router.delete("/delete_user/")
-def delete_user(user: User = Depends(AuthService().o2auth)):
+async def delete_user(user: User = Depends(AuthService().o2auth)):
     await AuthService().delete(by="username", **user.dict())
+    return {"detail": "User deleted successfully"}
