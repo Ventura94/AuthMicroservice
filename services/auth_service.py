@@ -6,7 +6,7 @@ from jose import jwt, JWTError, ExpiredSignatureError
 from jose.exceptions import JWTClaimsError
 from passlib.context import CryptContext
 from service_wrapper.orm.asyncio.mongodb import MongoDB
-from service_wrapper.services.asyncio.service import Create, Delete, Update
+from service_wrapper.services.asyncio.service import CreateMixin, DeleteMixin, UpdateMixin
 from starlette import status
 
 from database.mongo_service import MongoService
@@ -21,7 +21,7 @@ class UserInMongo:
     mongo.collection = "UserCollection"
 
 
-class AuthService(Create, Update, Delete):
+class AuthService(CreateMixin, UpdateMixin, DeleteMixin):
     orm_model = MongoDB(UserInMongo.mongo.collection)
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login", description="authorization")
