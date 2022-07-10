@@ -5,3 +5,4 @@ motor~=3.0.0
 passlib~=1.7.4
 starlette~=0.19.1
 httpx~=0.23.0
+python-multipart~=0.0.5
