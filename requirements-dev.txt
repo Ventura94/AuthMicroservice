@@ -1,4 +1,3 @@
-
 pytest
 pytest-mock
 coverage
@@ -6,3 +5,4 @@ pytest-cov
 black
 pylint
 mypy
+trio
