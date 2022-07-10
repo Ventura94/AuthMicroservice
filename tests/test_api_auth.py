@@ -47,8 +47,7 @@ async def test_register(mocker: MockerFixture):
             email="johndoe@gmail.com",
             phone="12345678",
             password="secret",
-            )
+        )
         response = await ac.post("/auth/register", data=data,
                                  headers={"Content-Type": "application/x-www-form-urlencoded"})
         assert response.status_code == 200
-
