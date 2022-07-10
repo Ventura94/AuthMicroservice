@@ -55,7 +55,7 @@ async def register(form_data: UserRegisterForm = Depends()):
     return User(**data)
 
 
-@router.get("/auth_user/",
+@router.get("/auth_user",
             response_model=User,
             name="Authenticate user data",
             description="Get authenticate user data")
@@ -63,17 +63,17 @@ async def auth_user(user: User = Depends(AuthService().o2auth)):
     return user
 
 
-@router.patch("/update_profile/")
+@router.patch("/update_profile")
 async def update_profile(user: User = Depends(AuthService().o2auth)):
     pass
 
 
-@router.patch("/change_password/")
+@router.patch("/change_password")
 async def change_password(user: User = Depends(AuthService().o2auth)):
     pass
 
 
-@router.delete("/delete_user/")
+@router.delete("/delete_user")
 async def delete_user(user: User = Depends(AuthService().o2auth)):
     await AuthService().delete(by="username", **user.dict())
     return {"detail": "User deleted successfully"}

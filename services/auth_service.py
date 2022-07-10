@@ -1,12 +1,12 @@
 from typing import Dict
 
-from ServiceWrapper.orm.asyncio.mongodb import MongoDB
-from ServiceWrapper.services.asyncio.service import Create, Delete, Update
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError, ExpiredSignatureError
 from jose.exceptions import JWTClaimsError
 from passlib.context import CryptContext
+from service_wrapper.orm.asyncio.mongodb import MongoDB
+from service_wrapper.services.asyncio.service import Create, Delete, Update
 from starlette import status
 
 from database.mongo_service import MongoService
@@ -46,7 +46,7 @@ class AuthService(Create, Update, Delete):
         user = await self.orm_model.get(username=payload['username'])
         if not user or user.get("is_delete", False):
             raise self.authorized_exception("User don't exist")
-        return user
+        return User(**user)
 
     async def before_create(self, **kwargs) -> Dict[str, str]:
         if not Email.is_valid(kwargs["email"]):

@@ -32,7 +32,7 @@ async def test_login(mocker: MockerFixture) -> None:
 
 
 @pytest.mark.anyio
-async def test_register(mocker: MockerFixture):
+async def test_register_user(mocker: MockerFixture):
     mocker.patch.object(
         AuthService,
         "create",
@@ -50,4 +50,34 @@ async def test_register(mocker: MockerFixture):
         )
         response = await ac.post("/auth/register", data=data,
                                  headers={"Content-Type": "application/x-www-form-urlencoded"})
+        assert response.status_code == 200
+
+
+@pytest.mark.anyio
+async def test_delete_user(mocker: MockerFixture):
+    mocker.patch.object(
+        AuthService,
+        "o2auth",
+        return_value={
+            "username": "johndoe",
+            "name": "John",
+            "last_name": "Doe",
+            "email": "johndoe@gmail.com",
+            "phone": "12345678",
+            "role": [
+                "default"
+            ]
+        },
+        autospec=True,
+    )
+    mocker.patch.object(
+        AuthService,
+        "delete",
+        return_value=None,
+        autospec=True,
+    )
+    async with AsyncClient(app=app, base_url="http://test") as ac:
+        response = await ac.delete("/auth/delete_user",
+                                   headers={"Content-Type": "application/json",
+                                            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Impvbmhkb2UiLCJuYW1lIjoiSm9uaCIsImxhc3RfbmFtZSI6IkRvZSIsImVtYWlsIjoiam9uaGRvZUBnbWFpbC5jb20iLCJwaG9uZSI6IjEyMzQ1Njc4Iiwicm9sZSI6WyJkZWZhdWx0Il0sImV4cCI6MTY1NzQyMDA2M30.uArE5Hio--AXc-6Krw13TvVWP-MJtghLxdYI78fZnA8"})
         assert response.status_code == 200
