@@ -1,5 +1,5 @@
 import pytest
-from ServiceWrapper.orm.asyncio.mongodb import MongoDB
+from service_wrapper.orm.asyncio.mongodb import MongoDB
 from bson import ObjectId
 from httpx import AsyncClient
 from pytest_mock.plugin import MockerFixture
