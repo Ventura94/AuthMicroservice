@@ -17,7 +17,9 @@ jobs:
           API_KEY: ${{ secrets.API_KEY }}
         run: |
           python -m pip install --upgrade pip
-          python ServiceWrapper/setup.py install
+          cd ServiceWrapper
+          python setup.py install
+          cd ..
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
           coverage run -m pytest
