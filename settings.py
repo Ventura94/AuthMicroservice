@@ -1,7 +1,7 @@
 import os
 
-ACCESS_TOKEN_EXPIRE_MINUTES = 30 #os.environ["ACCESS_TOKEN_EXPIRE_MINUTES"]
+ACCESS_TOKEN_EXPIRE_MINUTES = os.environ["ACCESS_TOKEN_EXPIRE_MINUTES"]
 
-SECRET_KEY = "cualquiercosaliteral" #os.environ["SECRET_KEY"]
+SECRET_KEY = os.environ["SECRET_KEY"]
 
-ALGORITHM = "HS256" #os.environ["ALGORITHM"]
+ALGORITHM = os.environ["ALGORITHM"]
