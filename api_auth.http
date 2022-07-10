@@ -1,0 +1,5 @@
+### Send POST login
+POST https://localhost/auth/login
+Content-Type: application/x-www-form-urlencoded
+
+username=johndoe&password=secret

@@ -17,7 +17,7 @@ class UserInBD(BaseModel):
     password: str
     role: List[str]
     is_delete: bool
-    delete_at: str
+    delete_at: str = None
 
 
 class User(BaseModel):

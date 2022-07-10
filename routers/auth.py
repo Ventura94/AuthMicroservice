@@ -34,7 +34,7 @@ async def login(form_data: UserCredentialsForm = Depends()):
     return {"access_token": encoded_jwt, "token_type": "bearer"}
 
 
-@router.post("/users/register",
+@router.post("/register",
              response_model=User,
              name="Register users",
              description="Register users")
