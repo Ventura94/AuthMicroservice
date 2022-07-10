@@ -1,27 +1,53 @@
+from typing import Dict, Optional, List, Union
+
 import pytest
-from service_wrapper.orm.asyncio.mongodb import MongoDB
 from bson import ObjectId
 from httpx import AsyncClient
-from pytest_mock.plugin import MockerFixture
+from jose import jwt
+from pytest_mock import MockerFixture
+from service_wrapper.orm.asyncio.mongodb import MongoDB
 
 from main import app
 from services.auth_service import AuthService
 
-"""
-{'access_token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Impvbmhkb2UiLCJuYW1lIjoiSm9uaCIsImxhc3RfbmFtZSI6IkRvZSIsImVtYWlsIjoiam9uaGRvZUBnbWFpbC5jb20iLCJwaG9uZSI6IjEyMzQ1Njc4Iiwicm9sZSI6WyJkZWZhdWx0Il0sImV4cCI6MTY1NzQyMDA2M30.uArE5Hio--AXc-6Krw13TvVWP-MJtghLxdYI78fZnA8', 'token_type': 'bearer'}
 
-"""
+@pytest.fixture
+def user_dict_not_password() -> Dict[str, Optional[Union[List[str], str]]]:
+    return {"username": "johndoe",
+            "name": "John",
+            "last_name": "Doe",
+            "email": "johndoe@gmail.com",
+            "phone": "12345678",
+            "role": ["default"]
+            }
+
+
+@pytest.fixture
+def user_register_form() -> Dict[str, str]:
+    return dict(
+        username="johndoe",
+        name="John",
+        last_name="Doe",
+        email="johndoe@gmail.com",
+        phone="12345678",
+        password="secret",
+    )
+
+
+@pytest.fixture
+def mongo_user() -> Dict[str, Optional[Union[ObjectId, str, bool]]]:
+    return {'_id': ObjectId('62ca30f510685b55dd844c1b'), 'username': 'jonhdoe', 'name': 'Jonh',
+            'last_name': 'Doe', 'email': 'jonhdoe@gmail.com', 'phone': '12345678',
+            'password': '$2b$12$bg8hu.SPK9t/rOOEzeKTl.mDGOkC.vCEIlNNR90Am0onoxKIOqOgG', 'role': ['default'],
+            'is_delete': False, 'delete_at': None}
 
 
 @pytest.mark.anyio
-async def test_login(mocker: MockerFixture) -> None:
+async def test_login(mocker: MockerFixture, mongo_user) -> None:
     mocker.patch.object(
         MongoDB,
         "get",
-        return_value={'_id': ObjectId('62ca30f510685b55dd844c1b'), 'username': 'jonhdoe', 'name': 'Jonh',
-                      'last_name': 'Doe', 'email': 'jonhdoe@gmail.com', 'phone': '12345678',
-                      'password': '$2b$12$bg8hu.SPK9t/rOOEzeKTl.mDGOkC.vCEIlNNR90Am0onoxKIOqOgG', 'role': ['default'],
-                      'is_delete': False, 'delete_at': None},
+        return_value=mongo_user,
         autospec=True,
     )
     async with AsyncClient(app=app, base_url="http://test") as ac:
@@ -32,7 +58,7 @@ async def test_login(mocker: MockerFixture) -> None:
 
 
 @pytest.mark.anyio
-async def test_register_user(mocker: MockerFixture):
+async def test_register_user(mocker: MockerFixture, user_register_form):
     mocker.patch.object(
         AuthService,
         "create",
@@ -40,34 +66,30 @@ async def test_register_user(mocker: MockerFixture):
         autospec=True,
     )
     async with AsyncClient(app=app, base_url="http://test") as ac:
-        data = dict(
-            username="johndoe",
-            name="John",
-            last_name="Doe",
-            email="johndoe@gmail.com",
-            phone="12345678",
-            password="secret",
-        )
+        data = user_register_form
         response = await ac.post("/auth/register", data=data,
                                  headers={"Content-Type": "application/x-www-form-urlencoded"})
         assert response.status_code == 200
 
 
 @pytest.mark.anyio
-async def test_delete_user(mocker: MockerFixture):
+async def test_delete_user(mocker: MockerFixture, mongo_user, user_dict_not_password):
     mocker.patch.object(
         AuthService,
         "o2auth",
-        return_value={
-            "username": "johndoe",
-            "name": "John",
-            "last_name": "Doe",
-            "email": "johndoe@gmail.com",
-            "phone": "12345678",
-            "role": [
-                "default"
-            ]
-        },
+        return_value=user_dict_not_password,
+        autospec=True,
+    )
+    mocker.patch.object(
+        jwt,
+        "decode",
+        return_value=user_dict_not_password,
+        autospec=True,
+    )
+    mocker.patch.object(
+        MongoDB,
+        "get",
+        return_value=mongo_user,
         autospec=True,
     )
     mocker.patch.object(
