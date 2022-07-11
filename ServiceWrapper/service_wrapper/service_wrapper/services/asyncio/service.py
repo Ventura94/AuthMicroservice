@@ -31,7 +31,9 @@ class UpdateMixin(IService, ABC):
 
     async def update(self, by: str = "id", **kwargs):
         assert by in kwargs.keys(), "The field by which it is going to be updated was not defined"
-        await self.orm_model.update(by, **kwargs)
+        data = await self.before_update(**kwargs)
+        await self.orm_model.update(by, **data)
+        await self.after_update(**data)
 
     async def bulk_update(self, partial: bool = False, **kwargs):
         pass
@@ -63,7 +65,6 @@ class DeleteMixin(IService, ABC):
     async def bulk_delete(self, soft: bool = True, **kwargs):
         data = await self.before_delete(**kwargs)
         if soft:
-            data.update({"rife": {"is_delete": True}})
             await self.orm_model.bulk_update(**data)
         else:
             await self.orm_model.bulk_delete(**data)

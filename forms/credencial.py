@@ -1,6 +1,11 @@
 from fastapi import Form
 
 
+class ChangePasswordForm:
+    def __init__(self, password: str = Form(...)):
+        self.password = password
+
+
 class UserCredentialsForm:
     def __init__(
             self,

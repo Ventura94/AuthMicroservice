@@ -69,3 +69,8 @@ class AuthService(CreateMixin, UpdateMixin, DeleteMixin):
         if not self.pwd_context.verify(password, user.password):
             raise self.authorized_exception("Incorrect password")
         return User(**user.dict())
+
+    async def before_update(self, **kwargs):
+        if kwargs.get("password"):
+            kwargs["password"] = self.pwd_context.hash(kwargs["password"])
+        return kwargs
