@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 
-from forms.credencial import UserRegisterForm, UserCredentialsForm, ChangePasswordForm
+from forms.credencial import UserRegisterForm, UserCredentialsForm, ChangePasswordForm, UserUpdateForm
 from schemas.token import Token
 from schemas.user import User, UserInBD
 from services.auth_service import AuthService
@@ -64,14 +64,22 @@ async def auth_user(user: User = Depends(AuthService().o2auth)):
 
 
 @router.patch("/update_profile")
-async def update_profile(user: User = Depends(AuthService().o2auth)):
-    pass
+async def update_profile(user: User = Depends(AuthService().o2auth), user_profile_form: UserUpdateForm = Depends()):
+    await AuthService().update(by="username",
+                               username=user.username,
+                               new_username=user_profile_form.username,
+                               name=user_profile_form.name,
+                               last_name=user_profile_form.last_name,
+                               email=user_profile_form.email,
+                               phone=user_profile_form.phone,
+                               )
+    return {"detail": "Profile has changed"}
 
 
 @router.patch("/change_password")
 async def change_password(user: User = Depends(AuthService().o2auth), password_form: ChangePasswordForm = Depends()):
     await AuthService().update(by="username", username=user.username, password=password_form)
-    pass
+    return {"detail": "Password has changed"}
 
 
 @router.delete("/delete_user")

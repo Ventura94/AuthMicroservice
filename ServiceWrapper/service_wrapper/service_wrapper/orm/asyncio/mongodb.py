@@ -16,6 +16,7 @@ class MongoDB(IORMethods):
         id_to_update = {by: kwargs[by]}
         if f"new_{by}" in kwargs.keys():
             kwargs[by] = kwargs[f"new_{by}"]
+            del kwargs[f"new_{by}"]
         await self.model.update_one(id_to_update, {'$set': kwargs})
 
     async def bulk_update(self, **kwargs):
