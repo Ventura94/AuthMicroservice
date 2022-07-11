@@ -15,6 +15,9 @@ router = APIRouter(prefix="/auth", tags=["Authorization"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login", description="authorization")
 
 
+# TODO: Crear un alias random para cada usuario que no pueda ser cambiado, para usarlo como indice en la base de datos y
+#  no tener problemas cuando el usuario quiera cambiar su username
+
 @router.post(
     "/login",
     response_model=Token,

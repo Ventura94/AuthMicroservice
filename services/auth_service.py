@@ -63,9 +63,9 @@ class AuthService(CreateMixin, UpdateMixin, DeleteMixin):
             user = await self.orm_model.get(email=username)
         else:
             user = await self.orm_model.get(username=username)
-        user = UserInBD(**user)
-        if not user or user.is_delete:
+        if not user or user.get("is_delete", False):
             raise self.authorized_exception("User not found")
+        user = UserInBD(**user)
         if not self.pwd_context.verify(password, user.password):
             raise self.authorized_exception("Incorrect password")
         return User(**user.dict())
