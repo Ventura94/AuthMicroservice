@@ -3,6 +3,15 @@ on: push
 jobs:
   run:
     runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:5.0.5
+        env:
+          MONGO_INITDB_ROOT_USERNAME: prueba
+          MONGO_INITDB_ROOT_PASSWORD: prueba
+        ports:
+          - 27017:27017
+
     env:
       OS: ubuntu-latest
       PYTHON: '3.9'
@@ -12,13 +21,12 @@ jobs:
         uses: actions/setup-python@master
         with:
           python-version: 3.9
-      - name: Start MongoDB
-        uses: supercharge/mongodb-github-action@1.7.0
+
       - name: 'generate report'
         env:
           API_KEY: ${{ secrets.API_KEY }}
           ALGORITHM: ${{ secrets.ALGORITHM }}
-          MONGO_DB_URL: ${{ secrets.MONGO_DB_URL }}
+          MONGO_DB_URL: mongodb://prueba:prueba@127.0.0.1:27017/?retryWrites=true&w=majority
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
           python -m pip install --upgrade pip          
