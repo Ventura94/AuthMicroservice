@@ -31,9 +31,6 @@ jobs:
           python -m pip install --upgrade pip          
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
-          coverage run -m pytest
+          pytest --cov app
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
-        with:
-          flags: pytest
-          fail_ci_if_error: true
+        uses: codecov/codecov-action@v3
