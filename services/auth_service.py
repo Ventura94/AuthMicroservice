@@ -3,6 +3,7 @@ from typing import Dict
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError, ExpiredSignatureError
+from jose.constants import ALGORITHMS
 from jose.exceptions import JWTClaimsError
 from passlib.context import CryptContext
 from starlette import status
@@ -11,7 +12,7 @@ from database.mongo_service import MongoService
 from schemas.user import UserInBD, UserO2Auth
 from service_wrapper.orm.asyncio.mongodb import MongoDB
 from service_wrapper.services.asyncio.service import CreateMixin, DeleteMixin, UpdateMixin
-from settings import SECRET_KEY, ALGORITHM
+from settings import SECRET_KEY
 from tools.email import Email
 
 
@@ -36,7 +37,7 @@ class AuthService(CreateMixin, UpdateMixin, DeleteMixin):
 
     async def o2auth(self, token: str = Depends(oauth2_scheme)):
         try:
-            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM, ])
+            payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHMS.HS256)
         except JWTClaimsError as jwtce:
             raise self.authorized_exception("If any claim is invalid in any way.") from jwtce
         except ExpiredSignatureError as ese:

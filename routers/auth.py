@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
+from jose.constants import ALGORITHMS
 
 from forms.credencial import UserRegisterForm, UserCredentialsForm, ChangePasswordForm, UserUpdateForm
 from schemas.token import Token
