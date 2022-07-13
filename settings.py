@@ -4,6 +4,4 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 SECRET_KEY = os.environ["SECRET_KEY"]
 
-ALGORITHM = os.environ["ALGORITHM"]
-
 MONGO_DB_URL = os.environ["MONGO_DB_URL"]

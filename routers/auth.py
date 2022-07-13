@@ -9,7 +9,7 @@ from forms.credencial import UserRegisterForm, UserCredentialsForm, ChangePasswo
 from schemas.token import Token
 from schemas.user import User, UserInBD, UserO2Auth
 from services.auth_service import AuthService
-from settings import ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY, ALGORITHM
+from settings import ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY
 
 router = APIRouter(prefix="/auth", tags=["Authorization"])
 
