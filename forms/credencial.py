@@ -1,3 +1,6 @@
+from inspect import signature
+from typing import Union, Dict
+
 from fastapi import Form
 
 
@@ -37,11 +40,11 @@ class UserRegisterForm:
 class UserUpdateForm:
     def __init__(
             self,
-            username: str = Form(...),
-            name: str = Form(...),
-            last_name: str = Form(...),
-            email: str = Form(...),
-            phone: str = Form(...),
+            username: str = Form(default=None),
+            name: str = Form(default=None),
+            last_name: str = Form(default=None),
+            email: str = Form(default=None),
+            phone: str = Form(default=None),
 
     ):
         self.username = username
@@ -49,3 +52,13 @@ class UserUpdateForm:
         self.last_name = last_name
         self.email = email
         self.phone = phone
+
+    def clean_data(self, **kwargs) -> Dict[str, Union[str, float, int]]:
+        data = {}
+        for field in signature(self.__class__).parameters:
+            if getattr(self, field) is None:
+                del kwargs[field]
+            else:
+                data[field] = getattr(self, field)
+        kwargs.update(data)
+        return kwargs

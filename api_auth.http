@@ -1,9 +1,0 @@
-### Send POST login
-POST http://127.0.0.1:8000/auth/login
-Content-Type: application/x-www-form-urlencoded
-
-username=johndoe&password=secret
-
-### Delete by token. Use token to authorize.
-DELETE http://127.0.0.1:8000/auth/delete_user
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG5kb2UiLCJuYW1lIjoiSm9obiIsImxhc3RfbmFtZSI6IkRvZSIsImVtYWlsIjoiam9obmRvZUBnbWFpbC5jb20iLCJwaG9uZSI6IjEyMzQ1Njc4Iiwicm9sZSI6WyJkZWZhdWx0Il0sImV4cCI6MTY1NzQyMzA1OX0.63KNqIjBtkSMHGkrfrdrMocsNF21IQPa6TcT13X8LPY

@@ -1,6 +1,6 @@
 from abc import ABC
 
-from service_wrapper.interfaces.iservice import IService
+from service_wrapper.services.iservice import IService
 
 
 class CreateMixin(IService, ABC):
@@ -30,12 +30,12 @@ class CreateMixin(IService, ABC):
 class UpdateMixin(IService, ABC):
 
     async def update(self, by: str = "id", **kwargs):
-        assert by in kwargs.keys(), "The field by which it is going to be updated was not defined"
+        assert by in kwargs, "The field by which it is going to be updated was not defined"
         data = await self.before_update(**kwargs)
         await self.orm_model.update(by, **data)
         await self.after_update(**data)
 
-    async def bulk_update(self, partial: bool = False, **kwargs):
+    async def bulk_update(self,  **kwargs):
         pass
 
     async def before_update(self, **kwargs):
@@ -53,7 +53,7 @@ class UpdateMixin(IService, ABC):
 
 class DeleteMixin(IService, ABC):
     async def delete(self, soft: bool = True, by: str = "id", **kwargs):
-        assert by in kwargs.keys(), f"The field {by} which it is going to be updated was not defined"
+        assert by in kwargs, f"The field {by} which it is going to be updated was not defined"
         data = await self.before_delete(**kwargs)
         if soft:
             data.update({"is_delete": True})

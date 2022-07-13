@@ -28,7 +28,7 @@ class IORMethods(ABC):
         pass
 
     @abstractmethod
-    async def delete(self, soft: bool = True, by: str = "id", **kwargs):
+    async def delete(self, by: str = "id", **kwargs):
         pass
 
     @abstractmethod

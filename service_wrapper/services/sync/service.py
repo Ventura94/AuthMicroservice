@@ -1,6 +1,6 @@
 from abc import ABC
 
-from service_wrapper.interfaces.iservice import IService
+from service_wrapper.services.iservice import IService
 
 
 class CreateMixin(IService, ABC):

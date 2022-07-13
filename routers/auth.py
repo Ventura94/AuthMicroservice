@@ -1,3 +1,4 @@
+import random
 from datetime import datetime, timedelta
 
 from fastapi import APIRouter, Depends
@@ -6,7 +7,7 @@ from jose import jwt
 
 from forms.credencial import UserRegisterForm, UserCredentialsForm, ChangePasswordForm, UserUpdateForm
 from schemas.token import Token
-from schemas.user import User, UserInBD
+from schemas.user import User, UserInBD, UserO2Auth
 from services.auth_service import AuthService
 from settings import ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY, ALGORITHM
 
@@ -14,9 +15,6 @@ router = APIRouter(prefix="/auth", tags=["Authorization"])
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login", description="authorization")
 
-
-# TODO: Crear un alias random para cada usuario que no pueda ser cambiado, para usarlo como indice en la base de datos y
-#  no tener problemas cuando el usuario quiera cambiar su username
 
 @router.post(
     "/login",
@@ -43,6 +41,7 @@ async def login(form_data: UserCredentialsForm = Depends()):
              description="Register users")
 async def register(form_data: UserRegisterForm = Depends()):
     data = dict(
+        user_id=f"{form_data.username}{random.randint(0, 100)}",
         username=form_data.username,
         name=form_data.name,
         last_name=form_data.last_name,
@@ -67,25 +66,21 @@ async def auth_user(user: User = Depends(AuthService().o2auth)):
 
 
 @router.patch("/update_profile")
-async def update_profile(user: User = Depends(AuthService().o2auth), user_profile_form: UserUpdateForm = Depends()):
-    await AuthService().update(by="username",
-                               username=user.username,
-                               new_username=user_profile_form.username,
-                               name=user_profile_form.name,
-                               last_name=user_profile_form.last_name,
-                               email=user_profile_form.email,
-                               phone=user_profile_form.phone,
-                               )
+async def update_profile(user: UserO2Auth = Depends(AuthService().o2auth),
+                         user_profile_form: UserUpdateForm = Depends()):
+    data_to_update = user_profile_form.clean_data(**user.dict())
+    await AuthService().update(by="user_id", **data_to_update)
     return {"detail": "Profile has changed"}
 
 
 @router.patch("/change_password")
-async def change_password(user: User = Depends(AuthService().o2auth), password_form: ChangePasswordForm = Depends()):
-    await AuthService().update(by="username", username=user.username, password=password_form)
+async def change_password(user: UserO2Auth = Depends(AuthService().o2auth),
+                          password_form: ChangePasswordForm = Depends()):
+    await AuthService().update(by="user_id", user_id=user.user_id, password=password_form.password)
     return {"detail": "Password has changed"}
 
 
 @router.delete("/delete_user")
-async def delete_user(user: User = Depends(AuthService().o2auth)):
-    await AuthService().delete(by="username", **user.dict())
+async def delete_user(user: UserO2Auth = Depends(AuthService().o2auth)):
+    await AuthService().delete(by="user_id", **user.dict())
     return {"detail": "User deleted successfully"}

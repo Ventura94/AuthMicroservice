@@ -1,6 +1,6 @@
 from typing import List
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class UserCredentials(BaseModel):
@@ -9,6 +9,7 @@ class UserCredentials(BaseModel):
 
 
 class UserInBD(BaseModel):
+    user_id: str
     username: str
     name: str
     last_name: str
@@ -17,10 +18,20 @@ class UserInBD(BaseModel):
     password: str
     role: List[str]
     is_delete: bool
-    delete_at: str = None
+    delete_at: str = Field(default=None)
 
 
 class User(BaseModel):
+    username: str
+    name: str
+    last_name: str
+    email: str
+    phone: str
+    role: List[str]
+
+
+class UserO2Auth(BaseModel):
+    user_id: str
     username: str
     name: str
     last_name: str

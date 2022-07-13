@@ -1,11 +1,12 @@
 from motor import motor_asyncio
+from settings import MONGO_DB_URL
 
 
 class MongoService:
     __db = None
     __collection = None
 
-    def __init__(self, url_connection="mongodb://localhost:27017"):
+    def __init__(self, url_connection=MONGO_DB_URL):
         self.client = motor_asyncio.AsyncIOMotorClient(url_connection)
 
     @property

@@ -1,4 +1,4 @@
-from service_wrapper.interfaces.asyncio.iorm_db import IORMethods
+from service_wrapper.orm.asyncio.iorm_db import IORMethods
 
 
 class MongoDB(IORMethods):
@@ -12,9 +12,9 @@ class MongoDB(IORMethods):
         pass
 
     async def update(self, by: str = "id", **kwargs):
-        assert by in kwargs.keys(), f"The field {by} which it is going to be updated was not defined"
+        assert by in kwargs, f"The field {by} which it is going to be updated was not defined"
         id_to_update = {by: kwargs[by]}
-        if f"new_{by}" in kwargs.keys():
+        if f"new_{by}" in kwargs:
             kwargs[by] = kwargs[f"new_{by}"]
             del kwargs[f"new_{by}"]
         await self.model.update_one(id_to_update, {'$set': kwargs})
@@ -23,7 +23,7 @@ class MongoDB(IORMethods):
         pass
 
     async def delete(self, by: str = "id", **kwargs):
-        assert by in kwargs.keys(), "The field by which it is going to be deleted was not defined"
+        assert by in kwargs, "The field by which it is going to be deleted was not defined"
         id_to_delete = {by: kwargs[by]}
         element = await self.get(**id_to_delete)
         await element.delete()
