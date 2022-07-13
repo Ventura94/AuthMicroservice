@@ -3,9 +3,6 @@ on: push
 jobs:
   run:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        mongodb-version: [ '5.0' ]
     env:
       OS: ubuntu-latest
       PYTHON: '3.9'
@@ -14,11 +11,11 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@master
         with:
-          python-version: 3.7
+          python-version: 3.9
       - name: Start MongoDB
         uses: supercharge/mongodb-github-action@1.7.0
         with:
-          mongodb-version: ${{ matrix.mongodb-version }}
+          mongodb-version: 5.0
 
       - name: 'generate report'
         env:
