@@ -1,5 +1,7 @@
 # Para DataInt
 
+[![codecov](https://codecov.io/gh/Ventura94/AuthMicroservice/branch/master/graph/badge.svg?token=OXA7HO6HB6)](https://codecov.io/gh/Ventura94/AuthMicroservice)
+
 ## Tecnologías
 
 ![image](https://img.shields.io/badge/fastapi-109989?style=for-the-badge&logo=FASTAPI&logoColor=white)
