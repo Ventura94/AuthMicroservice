@@ -31,7 +31,7 @@ async def login(form_data: UserCredentialsForm = Depends()):
         minutes=ACCESS_TOKEN_EXPIRE_MINUTES
     )
     token_data.update({"exp": access_token_expires})
-    encoded_jwt = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(token_data, SECRET_KEY)
     return {"access_token": encoded_jwt, "token_type": "bearer"}
 
 
