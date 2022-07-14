@@ -1,16 +1,12 @@
 import random
-from datetime import datetime, timedelta
 
 from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordBearer
-from jose import jwt
-from jose.constants import ALGORITHMS
 
 from forms.credencial import UserRegisterForm, UserCredentialsForm, ChangePasswordForm, UserUpdateForm
 from schemas.token import Token
 from schemas.user import User, UserInBD, UserO2Auth
 from services.auth_service import AuthService
-from settings import ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY
 
 router = APIRouter(prefix="/auth", tags=["Authorization"])
 
@@ -24,15 +20,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login", description="authori
     description="Credentials are sent to build the access token",
 )
 async def login(form_data: UserCredentialsForm = Depends()):
-    user = await AuthService().user_authenticate(
-        form_data.username, form_data.password
-    )
-    token_data = user.dict()
-    access_token_expires = datetime.utcnow() + timedelta(
-        minutes=ACCESS_TOKEN_EXPIRE_MINUTES
-    )
-    token_data.update({"exp": access_token_expires})
-    encoded_jwt = jwt.encode(token_data, SECRET_KEY)
+    encoded_jwt = await AuthService().login_encoded_jwt(
+        form_data.username, form_data.password)
     return {"access_token": encoded_jwt, "token_type": "bearer"}
 
 

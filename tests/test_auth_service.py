@@ -10,7 +10,7 @@ from tools.email import Email
 
 
 def test_authorized_exception(auth_service) -> None:
-    result = auth_service.authorized_exception(message="Soy un error")
+    result = auth_service._authorized_exception(message="Soy un error")
     assert result.status_code == 401
     assert result.detail == "Soy un error"
 
@@ -61,7 +61,7 @@ async def test_before_create(mocker: MockerFixture, auth_service, user_register_
     )
     mocker.patch.object(
         AuthService,
-        "uniques_verify",
+        "_uniques_verify",
         return_value=None,
         autospec=True,
     )
@@ -86,7 +86,7 @@ async def test_before_create_invalid_email(mocker: MockerFixture, auth_service, 
     )
     mocker.patch.object(
         AuthService,
-        "uniques_verify",
+        "_uniques_verify",
         return_value=None,
         autospec=True,
     )
@@ -121,7 +121,7 @@ async def test_user_authenticate(mocker: MockerFixture, auth_service, mongo_user
         return_value=True,
         autospec=True,
     )
-    result = await auth_service.user_authenticate(**user_autenticate)
+    result = await auth_service._user_authenticate(**user_autenticate)
     assert result == UserO2Auth(**mongo_user)
 
 
@@ -147,7 +147,7 @@ async def test_user_authenticate_with_user_deleted(mocker: MockerFixture, auth_s
         autospec=True,
     )
     with pytest.raises(HTTPException):
-        await auth_service.user_authenticate(**user_autenticate)
+        await auth_service._user_authenticate(**user_autenticate)
 
 
 @pytest.mark.anyio
@@ -172,7 +172,7 @@ async def test_user_authenticate_with_incorrect_password(mocker: MockerFixture, 
         autospec=True,
     )
     with pytest.raises(HTTPException):
-        await auth_service.user_authenticate(**user_autenticate)
+        await auth_service._user_authenticate(**user_autenticate)
 
 
 @pytest.mark.anyio
@@ -199,11 +199,11 @@ async def test_uniques_verify(mocker: MockerFixture, auth_service, user_register
     )
     mocker.patch.object(
         AuthService,
-        "is_exist_in_db",
+        "_is_exist_in_db",
         return_value=False,
         autospec=True,
     )
-    assert await auth_service.uniques_verify(**user_register_form) is None
+    assert await auth_service._uniques_verify(**user_register_form) is None
 
 
 @pytest.mark.anyio
@@ -216,12 +216,12 @@ async def test_uniques_verify_not_uniques(mocker: MockerFixture, auth_service, u
     )
     mocker.patch.object(
         AuthService,
-        "is_exist_in_db",
+        "_is_exist_in_db",
         return_value=True,
         autospec=True,
     )
     with pytest.raises(HTTPException):
-        await auth_service.uniques_verify(**user_register_form)
+        await auth_service._uniques_verify(**user_register_form)
 
 
 @pytest.mark.anyio
@@ -234,12 +234,12 @@ async def test_uniques_verify_not_uniques(mocker: MockerFixture, auth_service, u
     )
     mocker.patch.object(
         AuthService,
-        "is_exist_in_db",
+        "_is_exist_in_db",
         return_value=True,
         autospec=True,
     )
     with pytest.raises(HTTPException):
-        await auth_service.uniques_verify(**user_register_form)
+        await auth_service._uniques_verify(**user_register_form)
 
 
 @pytest.mark.anyio
@@ -250,7 +250,7 @@ async def test_is_exist_in_db(mocker: MockerFixture, mongo_user, auth_service) -
         return_value=mongo_user,
         autospec=True,
     )
-    result = await auth_service.is_exist_in_db()
+    result = await auth_service._is_exist_in_db()
     assert result == True
 
 
@@ -262,5 +262,5 @@ async def test_is_exist_in_db_false(mocker: MockerFixture, auth_service) -> None
         return_value=None,
         autospec=True,
     )
-    result = await auth_service.is_exist_in_db()
+    result = await auth_service._is_exist_in_db()
     assert result == False
